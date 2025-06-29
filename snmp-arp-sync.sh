@@ -45,7 +45,10 @@ SNMP_OID=".1.3.6.1.2.1.4.22.1.2"
 QUIET=0
 VERBOSE=0
 DRY_RUN=0
-SOURCED=0
+
+if [ -z "$SOURCED" ]; then
+    SOURCED=0
+fi
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -85,8 +88,9 @@ while [ "$#" -gt 0 ]; do
             usage
             ;;
         -S|--sourced)
-            # hidden option to indicate the script is sourced, used for testing
-            # this is not intended for end users
+            # Hidden option to indicate the script is sourced, used for testing. This is not
+            # intended for end users. If arguments cannot be passed when being sourced, export
+            # SOURCED=1 before sourcing.
             SOURCED=1
             shift 1
             ;;
