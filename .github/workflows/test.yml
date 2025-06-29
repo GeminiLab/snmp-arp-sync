@@ -21,7 +21,7 @@ jobs:
       run: |
         TEST_SHELL=$(./test/utils/setup-shell/${{ matrix.shell }}.sh)
         echo "Using shell: $TEST_SHELL"
-        echo "TEST_SHELL=\"$TEST_SHELL\"" >> $GITHUB_ENV
+        echo "TEST_SHELL=$TEST_SHELL" >> $GITHUB_ENV
     - name: Run syntax check on main script
       run: |
         ${TEST_SHELL} -n snmp-arp-sync.sh
