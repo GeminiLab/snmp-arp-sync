@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        shell: [bash, dash, zsh, ash]
+        shell: [bash, dash, zsh, ash, sh, busybox-ash]
       fail-fast: false
     name: Test with ${{ matrix.shell }}
     steps:
@@ -17,59 +17,16 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y snmp iproute2 gawk grep
-    - name: "Install shell: ${{ matrix.shell }}"
+    - name: "Configure shell: ${{ matrix.shell }}"
       run: |
-        case "${{ matrix.shell }}" in
-          bash)
-            sudo apt-get install -y bash
-            ;;
-          dash)
-            sudo apt-get install -y dash
-            ;;
-          zsh)
-            sudo apt-get install -y zsh
-            ;;
-          ash)
-            sudo apt-get install -y busybox-static
-            ;;
-        esac
-    - name: Ensure scripts are executable
-      run: |
-        chmod +x snmp-arp-sync.sh
-        chmod +x test/test_ip_filter.sh
+        echo "TEST_SHELL=$(./test/utils/setup-shell/${{ matrix.shell }}.sh)" >> $GITHUB_ENV
     - name: Run syntax check on main script
       run: |
-        case "${{ matrix.shell }}" in
-          bash)
-            bash -n snmp-arp-sync.sh
-            ;;
-          dash)
-            dash -n snmp-arp-sync.sh
-            ;;
-          zsh)
-            zsh -n snmp-arp-sync.sh
-            ;;
-          ash)
-            busybox ash -n snmp-arp-sync.sh
-            ;;
-        esac
+        ${TEST_SHELL} -n snmp-arp-sync.sh
     - name: Run test script with ${{ matrix.shell }}
       run: |
-        case "${{ matrix.shell }}" in
-          bash)
-            bash test/test_ip_filter.sh
-            ;;
-          dash)
-            dash test/test_ip_filter.sh
-            ;;
-          zsh)
-            zsh test/test_ip_filter.sh
-            ;;
-          ash)
-            busybox ash test/test_ip_filter.sh
-            ;;
-        esac
-        
+        ${TEST_SHELL} test/test_ip_filter.sh
+
   integration-test:
     runs-on: ubuntu-latest
     needs: test
