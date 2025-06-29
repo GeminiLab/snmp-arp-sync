@@ -1,5 +1,7 @@
 # SNMP ARP Sync
 
+![GitHub Workflow Status](https://img.shields.io/github/check-runs/GeminiLab/snmp-arp-sync/master)
+
 A shell script utility for synchronizing ARP entries (IP-MAC mappings) using SNMP data from network devices. 
 
 ## Usage

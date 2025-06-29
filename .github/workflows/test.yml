@@ -1,0 +1,64 @@
+name: Test SNMP ARP Sync
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        shell: [bash, dash, zsh, ash, sh, busybox-ash]
+      fail-fast: false
+    name: Test with ${{ matrix.shell }}
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y snmp iproute2 gawk grep
+    - name: "Configure shell: ${{ matrix.shell }}"
+      run: |
+        TEST_SHELL=$(./test/utils/setup-shell/${{ matrix.shell }}.sh)
+        echo "Using shell: $TEST_SHELL"
+        echo "TEST_SHELL=$TEST_SHELL" >> $GITHUB_ENV
+    - name: Run syntax check on main script
+      run: |
+        ${TEST_SHELL} -n snmp-arp-sync.sh
+    - name: Test ip filter script
+      run: |
+        ${TEST_SHELL} test/test_ip_filter.sh
+    - name: Test MAC address normalization
+      run: |
+        ${TEST_SHELL} test/test_mac_normalize.sh
+
+  integration-test:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y snmp iproute2 gawk grep
+    - name: Make script executable
+      run: chmod +x snmp-arp-sync.sh
+    - name: Test argument validation
+      run: |
+        # Test missing required arguments
+        if ./snmp-arp-sync.sh 2>/dev/null; then
+          echo "Error: Script should have failed with missing arguments"
+          exit 1
+        else
+          echo "Argument validation working correctly"
+        fi
+    - name: Test invalid arguments
+      run: |
+        # Test invalid option
+        if ./snmp-arp-sync.sh --invalid-option 2>/dev/null; then
+          echo "Error: Script should have failed with invalid option"
+          exit 1
+        else
+          echo "Invalid option handling working correctly"
+        fi
