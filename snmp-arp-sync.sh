@@ -136,7 +136,7 @@ ip_in_subnet() {
 }
 
 # Normalize a MAC address string with colon or space as separator, adding leading zeros for each
-# part if necessary.
+# part if necessary. Converts uppercase letters to lowercase.
 normalize_mac() {
     raw_mac="$1"
     norm_mac=""
@@ -151,6 +151,7 @@ normalize_mac() {
 
     # Add leading zeros if necessary
     for part in "$@"; do
+        part=$(echo "$part" | tr 'A-Z' 'a-z')  # Convert to lowercase
         [ ${#part} -eq 1 ] && part="0$part"
         norm_mac="${norm_mac}${part}:"
     done

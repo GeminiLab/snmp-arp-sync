@@ -25,9 +25,12 @@ jobs:
     - name: Run syntax check on main script
       run: |
         ${TEST_SHELL} -n snmp-arp-sync.sh
-    - name: Run test script with ${{ matrix.shell }}
+    - name: Test ip filter script
       run: |
         ${TEST_SHELL} test/test_ip_filter.sh
+    - name: Test MAC address normalization
+      run: |
+        ${TEST_SHELL} test/test_mac_normalize.sh
 
   integration-test:
     runs-on: ubuntu-latest
