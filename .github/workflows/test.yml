@@ -19,7 +19,9 @@ jobs:
         sudo apt-get install -y snmp iproute2 gawk grep
     - name: "Configure shell: ${{ matrix.shell }}"
       run: |
-        echo "TEST_SHELL=$(./test/utils/setup-shell/${{ matrix.shell }}.sh)" >> $GITHUB_ENV
+        TEST_SHELL=$(./test/utils/setup-shell/${{ matrix.shell }}.sh)
+        echo "Using shell: $TEST_SHELL"
+        echo "TEST_SHELL=\"$TEST_SHELL\"" >> $GITHUB_ENV
     - name: Run syntax check on main script
       run: |
         ${TEST_SHELL} -n snmp-arp-sync.sh
